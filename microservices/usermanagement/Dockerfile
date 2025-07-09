@@ -5,6 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm install
+RUn npm install socket.io-client
 RUN npm install --save-dev @types/better-sqlite3
 
 COPY . .
