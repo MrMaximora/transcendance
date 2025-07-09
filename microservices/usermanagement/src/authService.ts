@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { createUser, User } from './userModel.js';
+import { creatUserSocket } from './userSocket.js';
 import bcrypt from 'bcrypt';
 import db from './dbSqlite/db.js';
 
@@ -53,6 +54,10 @@ export async function auth(app: FastifyInstance) {
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) 
         return reply.code(401).send({ error: 'Invalid username or password' });
+    // CREATE SOCKET FOR LIVE CHAT
+    console.log("creating socket !")
+    creatUserSocket(user.id);
+    console.log("socket created !")
     //SIGN TOKEN FOR THAT SESSION ANOTHER IS GENERATE AT EACH CONNECTION
     const token = app.jwt.sign({ userId: user.id, username: user.username });
     // RETURN IT FOR OTHERS SERVICES CAN BE USED IT!
