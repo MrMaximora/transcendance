@@ -18,7 +18,8 @@ function handleRoute() {
   const path = window.location.pathname;
   const token = localStorage.getItem('token');
   const app = document.getElementById('app');
-  if (!app) 
+  const chat = document.getElementById('chat');
+  if (!app || !chat) 
     return;
   switch (path) {
     case '/':
@@ -67,6 +68,25 @@ function handleRoute() {
       break;
     default:
       app.innerHTML = `<h2>404 - Page not found</h2>`;
+  }
+  if (token)
+  {
+    chat.innerHTML = `<div id="chat-container">
+      <div id="chat-header">Mon Chat</div>
+
+      <div id="chat-messages">
+        <div class="message">
+          <span class="username">Alice</span>
+          <p class="message-text">Salut !</p>
+        </div>
+      </div>
+
+      <div id="chat-input">
+        <input type="text" id="message" name="message" placeholder="Tape ton message..." />
+        <button type="send">Envoyer</button>
+      </div>
+    </div>`;
+    import('./chatClient.js').then((mod) => mod.init?.());
   }
 }
 

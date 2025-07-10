@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import http from 'http';
 import cors from '@fastify/cors';
-import fastifyIO from 'fastify-socket.io';
+import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import jwt from '@fastify/jwt';
 import db from './dbSqlite/db.js';
@@ -23,41 +23,38 @@ dotenv.config();
 // START APP FOR USERMANAGEMENT
 const app = Fastify();
 // CREATE SERVER
-
-// const server = http.createServer(app.server);
-
+const server = http.createServer(app.server);
 // CREATE PATH DO SQLITE FOR STOCK DATA-USER
 const PORT = process.env.USER_MANA_PORT;
 
-app.register(fastifyIO);
-
-app.ready().then(() => {
-  app.io.on('connection', (socket) => {
-    console.log(`USER connected: ${socket.id}`);
-
-    socket.on('register-socket', (userID: number) => {
-      const stmt = db.prepare('UPDATE users SET socket = ?, is_online = 1 WHERE id = ?');
-      stmt.run(socket.id, userID);
-      console.log(`Socket ${socket.id} registered to user ${userID}`);
-    });
-
-    socket.on('disconnect', () => {
-      const stmt = db.prepare('UPDATE users SET is_online = 0 WHERE socket = ?');
-      stmt.run(socket.id);
-      console.log(`Socket ${socket.id} disconnected`);
-    });
-  });
+await app.register(cors, {
+  origin: '*',
+  credentials: true,
 });
-// CREATE SOCKET.IO SERVER
 
-// const io = new Server(server, {
-//   cors: {
-//     origin: '*', // ALL ORIGIN REQUEST ALLOWED
-//   },
-// });
+// CREATE SOCKET.IO SERVER
+const io = new Server(server, {
+  cors: {
+    origin: '*', // ALL ORIGIN REQUEST ALLOWED
+  },
+});
 
 //SOCKET LOGIC
+io.on('connection', (socket) => {
+  console.log(`USER connected: ${socket.id}`);
 
+  socket.on('register-socket', (userID: number) => {
+    const stmt = db.prepare('UPDATE users SET socket = ?, is_online = 1 WHERE id = ?');
+    stmt.run(socket.id, userID);
+    console.log(`Socket ${socket.id} registered to user ${userID}`);
+  });
+
+  socket.on('disconnect', () => {
+    const stmt = db.prepare('UPDATE users SET is_online = 0 WHERE socket = ?');
+    stmt.run(socket.id);
+    console.log(`Socket ${socket.id} disconnected`);
+  });
+});
 
 //TOKEN
 app.register(jwt, { secret: process.env.JWT_SECRET! });
@@ -91,6 +88,10 @@ app.addHook('onRequest', async (request, reply) => {
   } catch (err) {
     return reply.code(401).send({ error: 'Unauthorized: Invalid token' });
   }
+});
+
+server.listen(3004, '0.0.0.0', () => {
+  console.log(`Chat service runing on port 3004`);
 });
 
 app.listen(Number(PORT), '0.0.0.0', () => {
