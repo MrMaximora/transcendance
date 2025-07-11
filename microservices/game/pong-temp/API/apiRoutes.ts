@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import {GameManager} from "../GameManager.ts";
+import {GameManager} from "../GameManager.js";
 
 export function loadFastify(manager: GameManager, fastify: Fastify) {
     fastify.get('/api/game', async (request, reply) => {

@@ -1,7 +1,7 @@
 import * as Vec2D from "vector2d";
 import {Collidable} from "./Collidable";
 import {Paddle} from "./Paddle";
-import {clamp} from "../utils.ts";
+import {clamp} from "../utils";
 
 export class Ball {
 

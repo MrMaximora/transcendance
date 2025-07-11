@@ -1,5 +1,5 @@
-import {Game} from './Game.ts'
-import {Paddle} from "./gameObjects/Paddle.ts";
+import {Game} from './Game.js'
+import {Paddle} from "./gameObjects/Paddle.js";
 import * as Vec2D from "vector2d";
 
 export class GameManager {

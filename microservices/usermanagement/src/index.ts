@@ -18,6 +18,7 @@ import {
   friendDelete,
   friendSendMsg
 } from './userRoutes.js';
+import { ChatMessage } from './userSocket.js';
 
 dotenv.config();
 // START APP FOR USERMANAGEMENT
@@ -47,6 +48,11 @@ io.on('connection', (socket) => {
     const stmt = db.prepare('UPDATE users SET socket = ?, is_online = 1 WHERE id = ?');
     stmt.run(socket.id, userID);
     console.log(`Socket ${socket.id} registered to user ${userID}`);
+  });
+
+  socket.on('message', (msg) => {
+    console.log('message received');
+    io.emit('message', msg, msg.for);
   });
 
   socket.on('disconnect', () => {

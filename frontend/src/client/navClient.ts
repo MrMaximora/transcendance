@@ -76,17 +76,17 @@ function handleRoute() {
 
       <div id="chat-messages">
         <div class="message">
-          <span class="username">Alice</span>
-          <p class="message-text">Salut !</p>
+          <span class="username">Name</span>
+          <p class="message-text">old !</p>
         </div>
       </div>
 
-      <div id="chat-input">
-        <input type="text" id="message" name="message" placeholder="Tape ton message..." />
-        <button type="send">Envoyer</button>
-      </div>
+      <form id="chat-input">
+        <input type="text" id="message" required placeholder="Tape ton message..." />
+        <button type="send-msg">Envoyer</button>
+      </form>
     </div>`;
-    import('./chatClient.js').then((mod) => mod.init?.());
+    import('./chatClient.js').then((mode) => mode.init?.());
   }
 }
 

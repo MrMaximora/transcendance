@@ -1,5 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import db from './dbSqlite/db.js';
+import { ChatMessage } from './userSocket.js';
+import { Socket } from 'socket.io';
 
 export async function profil(app: FastifyInstance) {
   app.get('/profil', async (request, reply) => {
@@ -58,15 +60,27 @@ export async function friendDelete(app: FastifyInstance) {
 
 export async function friendSendMsg(app: FastifyInstance) {
     app.post('/priv-msg/:username', async (request, reply) => {
+      console.log('message load !');
     try {
-        const user = request.user as { userId: number };
+        const user = request.user as { username: string, userId: Number };
         const { message } = request.body as { message: string };
         const { username: targetUsername } = request.params as { username: string };
-        const target = db.prepare('SELECT id FROM users WHERE username = ?').get(targetUsername) as { id: number };
+        const target = db.prepare('SELECT socket FROM users WHERE username = ?').get(targetUsername) as { id: string};
+        const targetId = db.prepare('SELECT id FROM users WHERE username = ?').get(targetUsername) as { id: Number};
+        const socket = db.prepare('SELECT socket FROM users WHERE username = ?').get(user.username) as { id: Socket };
+       
         if (!target) 
             return reply.code(404).send({ error: 'User not found' });
-        // Real system would emit over socket or store in DB
-        return { success: true, from: user.userId, to: target.id, message };
+          console.log('userId = ', user, ' target = ', target);
+        const msg: ChatMessage = {
+          from: user.username,
+          for: target.id,
+          text: message,
+          timestamp: Date.now(),
+        };
+        socket.id.emit('message', msg);
+        console.log('message emit !');
+        return { success: true, from: user.userId, to: targetId.id, message };
     } catch (err) {
         return reply.code(500).send({ error: 'Failed to send message' });
     }
