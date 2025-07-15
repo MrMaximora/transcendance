@@ -5,6 +5,7 @@ dotenv.config();
 
 export interface ChatMessage {
     from: string;
+    target: Number;
     for: string;
 
     text: string;
@@ -23,7 +24,7 @@ export function creatUserSocket(userid : number)
     })
 
     socket.on("message", (msg: ChatMessage) => {
-        alert('New message !');
+        console.log('New message !');
     })
 
     socket.on("disconnect", () => {

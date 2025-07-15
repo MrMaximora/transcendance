@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import db from './dbSqlite/db.js';
 import { ChatMessage } from './userSocket.js';
-import { Socket } from 'socket.io';
+import { io } from './index.js';
 
 export async function profil(app: FastifyInstance) {
   app.get('/profil', async (request, reply) => {
@@ -65,21 +65,26 @@ export async function friendSendMsg(app: FastifyInstance) {
         const user = request.user as { username: string, userId: Number };
         const { message } = request.body as { message: string };
         const { username: targetUsername } = request.params as { username: string };
-        const target = db.prepare('SELECT socket FROM users WHERE username = ?').get(targetUsername) as { id: string};
+        const target = db.prepare('SELECT socket FROM users WHERE username = ?').get(targetUsername) as { socket: string};
         const targetId = db.prepare('SELECT id FROM users WHERE username = ?').get(targetUsername) as { id: Number};
-        const socket = db.prepare('SELECT socket FROM users WHERE username = ?').get(user.username) as { id: Socket };
-       
+        // ajouter un verification de target.onLine;
         if (!target) 
             return reply.code(404).send({ error: 'User not found' });
-          console.log('userId = ', user, ' target = ', target);
+        console.log('userId = ', user, ' target = ', target.socket);
+        
         const msg: ChatMessage = {
           from: user.username,
-          for: target.id,
+          target: targetId.id,
+          for: target.socket,
           text: message,
           timestamp: Date.now(),
         };
-        socket.id.emit('message', msg);
+
+        console.log(`target = ${target.socket}`);
+        // ajouter une save des X dernier messages
+        io.to(target.socket).emit('message', msg); // envoie du message au client 
         console.log('message emit !');
+
         return { success: true, from: user.userId, to: targetId.id, message };
     } catch (err) {
         return reply.code(500).send({ error: 'Failed to send message' });

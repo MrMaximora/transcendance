@@ -34,7 +34,7 @@ await app.register(cors, {
 });
 
 // CREATE SOCKET.IO SERVER
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: '*', // ALL ORIGIN REQUEST ALLOWED
   },
@@ -60,6 +60,7 @@ io.on('connection', (socket) => {
     stmt.run(socket.id);
     console.log(`Socket ${socket.id} disconnected`);
   });
+
 });
 
 //TOKEN
