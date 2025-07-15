@@ -11,9 +11,9 @@ export function init() {
     Send.addEventListener('submit', async (e) => {
         e.preventDefault();
         console.log('en attents du message !')
-        const msg = (document.getElementById('message') as HTMLInputElement).value;
+        const message = (document.getElementById('message') as HTMLInputElement).value;
         console.log(' message recuperer !')
-        if (msg === null)
+        if (message === null)
             return console.error("message null !");
         try {
             console.log('Start sended message !');
@@ -23,7 +23,7 @@ export function init() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({msg}),
+                body: JSON.stringify({message}),
             });
             const data = await res.json();
             if (res)

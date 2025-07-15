@@ -2,6 +2,8 @@ import { FastifyInstance } from 'fastify';
 import db from './dbSqlite/db.js';
 import { ChatMessage } from './userSocket.js';
 import { io } from './index.js';
+import { saveMessage } from './userSocket.js';
+
 
 export async function profil(app: FastifyInstance) {
   app.get('/profil', async (request, reply) => {
@@ -62,11 +64,11 @@ export async function friendSendMsg(app: FastifyInstance) {
     app.post('/priv-msg/:username', async (request, reply) => {
       console.log('message load !');
     try {
-        const user = request.user as { username: string, userId: Number };
+        const user = request.user as { username: string, userId: number };
         const { message } = request.body as { message: string };
         const { username: targetUsername } = request.params as { username: string };
         const target = db.prepare('SELECT socket FROM users WHERE username = ?').get(targetUsername) as { socket: string};
-        const targetId = db.prepare('SELECT id FROM users WHERE username = ?').get(targetUsername) as { id: Number};
+        const targetId = db.prepare('SELECT id FROM users WHERE username = ?').get(targetUsername) as { id: number};
         // ajouter un verification de target.onLine;
         if (!target) 
             return reply.code(404).send({ error: 'User not found' });
@@ -74,14 +76,16 @@ export async function friendSendMsg(app: FastifyInstance) {
         
         const msg: ChatMessage = {
           from: user.username,
+          userId: user.userId,
           target: targetId.id,
           for: target.socket,
           text: message,
-          timestamp: Date.now(),
+          timestamp: Date.now() // a garder ?
         };
 
         console.log(`target = ${target.socket}`);
         // ajouter une save des X dernier messages
+        saveMessage(msg);
         io.to(target.socket).emit('message', msg); // envoie du message au client 
         console.log('message emit !');
 

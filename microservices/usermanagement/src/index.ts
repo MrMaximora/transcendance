@@ -34,7 +34,7 @@ await app.register(cors, {
 });
 
 // CREATE SOCKET.IO SERVER
-export const io = new Server(server, {
+export const io = new Server(app.server, {
   cors: {
     origin: '*', // ALL ORIGIN REQUEST ALLOWED
   },
@@ -95,10 +95,6 @@ app.addHook('onRequest', async (request, reply) => {
   } catch (err) {
     return reply.code(401).send({ error: 'Unauthorized: Invalid token' });
   }
-});
-
-server.listen(3004, '0.0.0.0', () => {
-  console.log(`Chat service runing on port 3004`);
 });
 
 app.listen(Number(PORT), '0.0.0.0', () => {
