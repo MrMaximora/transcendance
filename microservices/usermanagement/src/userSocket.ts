@@ -11,7 +11,7 @@ export interface ChatMessage {
     for: string;
 
     text: string;
-    timestamp: number;
+    timestamp: string;
 }
 
 export function creatUserSocket(userId : number) 
@@ -41,12 +41,16 @@ export async function saveMessage(msg: ChatMessage) {
     const userId = msg.userId;
     const targetId = msg.target;
     const message = msg.text;
+    const id = 0;
+    const date = '';
 
     const newMessage: Message = {
+        id,
         username,
         userId,
         targetId,
-        message
+        message,
+        date
     }
 
     const msgId = createMessage(newMessage);

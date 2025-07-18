@@ -69,6 +69,7 @@ export async function friendSendMsg(app: FastifyInstance) {
         const { username: targetUsername } = request.params as { username: string };
         const target = db.prepare('SELECT socket FROM users WHERE username = ?').get(targetUsername) as { socket: string};
         const targetId = db.prepare('SELECT id FROM users WHERE username = ?').get(targetUsername) as { id: number};
+        const isOnline = db.prepare('SELECT is_online FROM users WHERE username = ?').get(targetUsername) as { is_online: number};
         // ajouter un verification de target.onLine;
         if (!target) 
             return reply.code(404).send({ error: 'User not found' });
@@ -80,13 +81,15 @@ export async function friendSendMsg(app: FastifyInstance) {
           target: targetId.id,
           for: target.socket,
           text: message,
-          timestamp: Date.now() // a garder ?
+          timestamp: Date.now().toString() // a garder ?
         };
 
         console.log(`target = ${target.socket}`);
         // ajouter une save des X dernier messages
-        saveMessage(msg);
-        io.to(target.socket).emit('message', msg); // envoie du message au client 
+        if (!isOnline.is_online)
+          saveMessage(msg);
+        else
+          io.to(target.socket).emit('message', msg); // envoie du message au client 
         console.log('message emit !');
 
         return { success: true, from: user.userId, to: targetId.id, message };

@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import jwt from '@fastify/jwt';
 import db from './dbSqlite/db.js';
+import { Message } from './chatModel.js'
 import {
   auth,
   register,
@@ -48,11 +49,26 @@ io.on('connection', (socket) => {
     const stmt = db.prepare('UPDATE users SET socket = ?, is_online = 1 WHERE id = ?');
     stmt.run(socket.id, userID);
     console.log(`Socket ${socket.id} registered to user ${userID}`);
+    const msg = db.prepare('SELECT * FROM conversation WHERE targetId = ?').all(userID) as Message[];
+    if (msg) {
+      msg.forEach(msg => {
+        const tmp: ChatMessage = {
+          from: msg.username,
+          userId: msg.userId,
+          target: msg.targetId,
+          for: socket.id,
+          text: msg.message,
+          timestamp: msg.date
+        };
+        console.log(`old message send to ${socket.id}`);
+        io.to(socket.id).emit('message', tmp);
+      });
+    }
   });
 
   socket.on('message', (msg) => {
     console.log('message received');
-    io.emit('message', msg, msg.for);
+    io.to(msg.for).emit('message', msg);
   });
 
   socket.on('disconnect', () => {
