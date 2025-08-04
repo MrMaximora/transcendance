@@ -57,6 +57,18 @@ services:
     networks:
       - app-network
 
+  game2:
+    build: ./microservices/game2
+    env_file:
+      - .env
+    container_name: game2-service
+    volumes:
+      - game_db_data:/data
+    ports:
+      - "${GAME2_PORT}:${GAME2_PORT}"
+    networks:
+      - app-network
+
   #redis:
   #  image: redis:7-alpine
   #  container_name: redis
