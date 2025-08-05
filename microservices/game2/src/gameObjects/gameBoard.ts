@@ -1,11 +1,11 @@
 import { Card } from './card.js';
 import * as math from "mathjs";
 
-export class gameBoard {
+export class GameBoard {
 
     private drawPile: Card[] = [];
     private playerOne: Card[] = [];
-    private playerTwo: Card[] = [];
+    private playerTwo: Card[] = []; // relier aux id du joueur pour plus de securiter
     private discardPile: Card[] = [];
 
     constructor() {
@@ -16,15 +16,15 @@ export class gameBoard {
         for (var number = 0, id = 0; id < 4; number++)
         {
             var tmp:Card = new Card(id, number);
-            var random:number = math.round(math.random() * (32 - 0) + 0);
-            while (this.drawPile[random])
+            var random:number = math.floor(math.random() * 32);
+            while (this.drawPile[random] || random >= 32)
             {
-                if (random == 31)
+                if (random >= 31)
                     random = 0
                 else
                     random++;
             }
-            // console.log(`${random} = ${id}.${number}`);
+            // console.log(`carte [${random}] = ${id}.${number}`);
             this.drawPile[random] = tmp;
             if (id == 0 && number == 1)
                 number = -1, id++;
@@ -35,8 +35,10 @@ export class gameBoard {
 
     public drawCard(player :number) {
         if (this.drawPile.length <= 0)
+        {
+            console.log('fail to draw card !');
             return ;
-
+        }
         if (player == 1) {
             this.playerOne.push(this.drawPile[0]);
             this.drawPile.splice(0, 1);
@@ -50,6 +52,7 @@ export class gameBoard {
     public discardCard(player :number, cardId :number, cardNumber :number) {
         if (this.playerOne.length <= 0 && this.playerTwo.length <= 0)
             return ;
+
         if (player == 1) {
             for (var i = 0; i < this.playerOne.length; i++) {
                 if (this.playerOne[i].getType() == cardId && this.playerOne[i].getNumber() == cardNumber) {
@@ -69,9 +72,21 @@ export class gameBoard {
             }
         }
     }
+    
+    public getPlayerCard(player :number)
+    {
+        if (player == 1)
+            return this.playerOne;
+        else
+            return this.playerTwo;
+    }
 
-    public getCard(id:number):number {
-
-        return ((this.drawPile[id].getType()) + (this.drawPile[id].getNumber() % 100)) as number;
+    public startGame()
+    {
+        for (var i = 0; i < 3; i++)
+        {
+            this.drawCard(1);
+            this.drawCard(2);
+        }
     }
 }

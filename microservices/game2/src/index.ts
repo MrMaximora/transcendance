@@ -10,6 +10,8 @@ import {
   postGame
 } from './gameRoutes.js';
 import { gameBoard } from './gameObjects/gameBoard.js';
+import { Card } from './gameObjects/card.js';
+
 //START FOR GAME SERVICES
 const app = Fastify();
 dotenv.config();
@@ -27,9 +29,17 @@ app.register(historyGame, {prefix: 'api/game' });
 app.register(postGame, { prefix: 'api/game' });
 
 const tmp:gameBoard = new gameBoard;
-
-for (var id = 0; id < 32; id++)
-  console.log(`card ${id} = ${tmp.getCard(id)}`);
+tmp.startGame();
+var playerOne : Card[] = tmp.getPlayerCard(1);
+console.log("player one : ")
+for (var i = 0; playerOne[i]; i++)
+  console.log(`${playerOne[i].getType()}.${playerOne[i].getNumber()}`);
+tmp.discardCard(1, playerOne[2].getType(), playerOne[2].getNumber());
+tmp.drawCard(1);
+var playerOne : Card[] = tmp.getPlayerCard(1);
+console.log("\nplayer one : ")
+for (var i = 0; playerOne[i]; i++)
+  console.log(`${playerOne[i].getType()}.${playerOne[i].getNumber()}`);
 
 // HOOK
 app.addHook('onRequest', async (request, reply) => {
