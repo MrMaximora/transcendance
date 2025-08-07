@@ -1,7 +1,7 @@
 import { GameBoard } from "./gameObjects/gameBoard";
 
 // le start du jeu, les actions, les point(, la fin et le lobby d'attente de joueur ?) 
-;
+
 export class game
 {
     private playerOneId :number;
@@ -28,7 +28,6 @@ export class game
             else
                 return console.log('Player one win !');
         }
-
         switch(idOne)
         {
             case 1 :

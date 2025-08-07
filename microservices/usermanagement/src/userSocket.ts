@@ -13,19 +13,25 @@ export interface ChatMessage {
     timestamp: string;
 }
 
-export function creatUserSocket(userId : number) {
-    const socket = io(process.env.URL_CHAT, {});
+export async function creatUserSocket(userId : number) {
+    const socket = await io("http://localhost:3001");
+    console.log(`socket (${socket}) client on creation !`);
+
     socket.on("connect", () => {
-    socket.emit("register-socket", userId);
-    console.log("socket registed !");
+        socket.emit("register-socket", userId);
+        console.log("socket registed !");
     });
+
     socket.on("message", (msg: ChatMessage) => {
-    console.log(msg.text);
-    console.log('New message !');
+        console.log(msg.text);
+        console.log('New message !');
     });
+
     socket.on("disconnect", () => {
-    console.log("disconnected !");
+        console.log("disconnected !");
     });
+
+    return socket;
 }
 
 export async function saveMessage(msg: ChatMessage) {

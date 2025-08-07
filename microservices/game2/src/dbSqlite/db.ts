@@ -15,7 +15,7 @@ const db = new Database(dbPath);
 
 // Ensure table exists
 db.exec(`
-  CREATE TABLE IF NOT EXISTS games (
+  CREATE TABLE IF NOT EXISTS games2 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     lobby_name TEXT NOT NULL,
     player_one_id INTEGER NOT NULL,

@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { createUser, User } from './userModel.js';
 import bcrypt from 'bcrypt';
 import db from './dbSqlite/db.js';
+import {creatUserSocket} from "./userSocket.js";
 
 export async function register(app: FastifyInstance) {
   app.post('/register', async (request, reply) => {
@@ -54,9 +55,12 @@ export async function auth(app: FastifyInstance) {
     if (!valid) 
         return reply.code(401).send({ error: 'Invalid username or password' });
     //SIGN TOKEN FOR THAT SESSION ANOTHER IS GENERATE AT EACH CONNECTION
-    const token = app.jwt.sign({ userId: user.id, username: user.username });
+    const socket = await creatUserSocket(user.id);
+    // while (!socket.connected)
+    await new Promise(res => setTimeout(res, 100));
+    console.log(`socket id -> ${socket.id}`);
+    const token = app.jwt.sign({ userId: user.id, username: user.username, chatSocket: {socket} });
     // RETURN IT FOR OTHERS SERVICES CAN BE USED IT!
     return reply.send({ token });
     });
 }
-
