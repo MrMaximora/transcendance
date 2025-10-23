@@ -239,7 +239,7 @@ export class Game {
             paddle.hitbox.getPoints().forEach((point) => { point.y += dY });
             paddle.shouldMove = [false, false];
         })
-        if (this._score[scoringTeam] == 3) {
+        if (this._score[scoringTeam] == 5) {
             this._state = "ended";
             return;
         }

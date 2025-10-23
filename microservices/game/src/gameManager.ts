@@ -220,12 +220,12 @@ export class GameManager {
         const [game, [p1, p2]] = this._games.get(lobbyName)!;
         if (game === undefined)
             return null;
-        const usernameLeftTeam = this.getUsernameFromSocket(this.getSocketId(p1!)!, io);
+        let usernameLeftTeam = this.getUsernameFromSocket(this.getSocketId(p1!)!, io);
         let usernameRightTeam = this.getUsernameFromSocket(this.getSocketId(p2!)!, io);
         if (p2 === -2)
             usernameRightTeam = 'ia';
-        else if (p2 === -1)
-            usernameRightTeam = game.localPlayer;
+        else if (p1 === -1)
+            usernameLeftTeam = game.localPlayer;
         return {
             ballPos: { x: game.ball.pos.x, y: game.ball.pos.y },
             ballDir: { x: game.ball.dir.x, y: game.ball.dir.y },

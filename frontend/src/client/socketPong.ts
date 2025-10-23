@@ -113,7 +113,6 @@ export function createPongSocket(socketPong: Socket | null) {
             <p><strong>Status:</strong> ${data.status}</p>`;
     });
 
-
     socketPong.on('in-game', () => {
         const path = window.location.pathname;
         if (path !== '/pong')
@@ -197,6 +196,9 @@ export function createPongSocket(socketPong: Socket | null) {
         const ffBtn = document.getElementById("pong-ff") as HTMLButtonElement;
         const msgGameEnd = document.getElementById("msg-end") as HTMLElement;
 		const returnBtn = document.getElementById('return') as HTMLDivElement;
+        const isForfeit = data.score[0] + data.score[1] > 10;
+        data.score[0] = Math.min(data.score[0], 5);
+        data.score[1] = Math.min(data.score[1], 5);
 		returnBtn.style.display = 'block';
 		msgGameEnd.style.display = "block";
         let msg = "You won"
@@ -225,6 +227,8 @@ export function createPongSocket(socketPong: Socket | null) {
                 endMsg = `${data.score[0]} - ${data.score[1]}`
             }
         }
+        if (isForfeit)
+            msg += " by forfeit"
         msgGameEnd.innerHTML = `
             <p>${msg} with score of ${endMsg}</p>`
         if (!canvas)
