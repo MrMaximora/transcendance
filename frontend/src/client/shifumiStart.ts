@@ -13,7 +13,7 @@ let replaceBy: number = -1;
 let tmpButtons: HTMLButtonElement[] = [];
 
 async function animationCoin(result: number) {
-  const text = ["pile", "face"];
+  const text = ["tails", "heads"];
   const coin = document.getElementById("coin-button");
 
   if (!coin)
@@ -51,7 +51,8 @@ function creatTmpButton() {
         {
             const btn = document.createElement('button');
             btn.hidden = false;
-            btn.classList.add("card")
+            btn.classList.add("btnTmp");
+            btn.classList.add("card");
             app.insertAdjacentElement('afterend', btn);
             tmpButtons.push(btn);
         }
@@ -59,10 +60,17 @@ function creatTmpButton() {
 }
 
 function updateTmpButton(value: string[]) {
+    const text = ["Joker", "rock", "Paper", "Scissors"]
     tmpButtons.forEach((btn, i) => {
         if (value[i])
         {
             btn.textContent = value[i];
+            if (choseCard == -1) {
+                btn.style.setProperty('--before-text', `"${text[myCard[i][0]]}"`);
+            }
+            else {
+                btn.style.setProperty('--before-text', `""`);
+            }
             btn.addEventListener('click', (e) => {
                 if (choseCard == -1) {
                     choseCard = i;
@@ -303,11 +311,11 @@ export function init() {
                 return ;
             choseCard = -1;
             replaceBy = -1;
-            const result = Math.floor(Math.random() * 100) % 2;
+            let result = Math.floor(Math.random() * 100) % 2;
             deleteTmpButton();
             await animationCoin(result);
             await sleep(1000);
-            // lancer l'animation
+
             if (result == 1) {
                 hiddenButtonCard(true);
                 creatTmpButton();

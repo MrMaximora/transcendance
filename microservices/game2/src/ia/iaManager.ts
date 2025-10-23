@@ -4,7 +4,7 @@ export class IaManager
 {
 
     private _ia: Map<number, Ia>;
-    private _nextId: number = -1;
+    private _nextId: number = -2;
     private static instance: IaManager | null = null;
 
     private constructor() {
