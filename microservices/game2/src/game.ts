@@ -1,6 +1,14 @@
 import { GameBoard } from "./gameObjects/gameBoard.js";
 import { io } from "./index.js"
-import {timeStart, endGame, forfeit, saveStats, deleteGameFromDB, getPlayerName} from "./Game2Database.js";
+import {
+    timeStart,
+    endGame,
+    forfeit,
+    saveStats,
+    deleteGameFromDB,
+    getPlayerName,
+    getOpponentName
+} from "./Game2Database.js";
 import { playedCard } from "./gameObjects/gameBoard.js";
 import { Socket } from "socket.io";
 import { getUsernameFromToken } from './socketManagement.js'
@@ -192,7 +200,7 @@ export class game
 
         player.IsOnline = true;
         socket.join(roomName);
-        io.to(socket.id).emit('reconnect', player.usedCoin);
+        io.to(socket.id).emit('reconnect', player.usedCoin, getOpponentName(this.gameId, userId));
         socket.to(`${this.gameId}.1`).to(`${this.gameId}.2`).emit('opponent-reconnected', getUsernameFromToken(socket.handshake.auth.token));
         await this.sleep(this.delay / 20);
         io.to(socket.id).emit('started-game', this.gameId);

@@ -128,23 +128,12 @@ export function socketManagemente(io: Server) {
             socket.data.player = -1;
             socket.data.gameId = -1;
 
-            checkReconnect(io, socket, userId); // a tester
-
-            // const id = db.prepare(`SELECT id FROM games2 WHERE status = 'playing' AND (player_one_id = ? OR player_two_id = ?)`).get(userId, userId) as { id : number } | undefined;
-            // if (!id)
-            //     return io.to(socket.id).emit('no-game');
-            // let game = manager.getGame(id.id);
-            // if (game)
-            // {
-            //     socket.data.gameId = id.id;
-            //     game.reconnect(userId, socket);
-            // }
+            checkReconnect(io, socket, userId);
         });
 
         socket.on('disconnect', () =>
         {
             const playerId = socket.data.userId;
-            // const gameId = db.prepare(`SELECT id FROM games2 WHERE status = 'playing' AND (player_one_id = ? OR player_two_id = ?)`).get(playerid, playerid) as { id : number } | undefined;
             const gameId = socket.data.gameId;
             if (gameId)
             {
@@ -158,6 +147,11 @@ export function socketManagemente(io: Server) {
             console.log(`Socket Shifumi disconnected: ${socket.id}`);
             // suprimer la game en cours si status = waiting et qu'il ny a pas de second joueurs
         });
+
+        socket.on('leave-room', (name:string) => {
+            socket.leave(name);
+            io.to(socket.id).emit('roomInfo', "you quit room");
+        })
 
         /******************************************************************************/
         /*                                                                            */

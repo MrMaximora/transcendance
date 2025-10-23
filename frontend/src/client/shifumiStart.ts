@@ -154,8 +154,15 @@ export function init() {
         forfeit.addEventListener( 'click', async (e) => {
             e.preventDefault();
             const sock = getSocket(2);
-            if (sock)
+            if (sock) {
+                if (spectate.spec) {
+                    spectate.spec = false;
+                    sock.emit('leave-room', `${gameIdShifumi}.${spectate.player}`);
+                    history.pushState(null, '', '/shifumi-lobby');
+                    handleRoute();
+                }
                 sock.emit('forfeit');
+            }
         });
     }
 

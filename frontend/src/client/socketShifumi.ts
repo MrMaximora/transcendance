@@ -54,10 +54,14 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
       notify(`Socket disconnected: ${reason}`);
     });
 
-    socketShifumi.on('reconnect', (coinUse: boolean) => {
+    socketShifumi.on('reconnect', async (coinUse: boolean, opponentName: string) => {
       history.pushState(null, '', '/shifumi');
       handleRoute();
       usedCoin = coinUse;
+      await sleep(30);
+      const opponent = document.getElementById('opponent-name');
+      if (opponent)
+          opponent.textContent = `your opponent is ${opponentName}`;
     });
 
     /******************************************************************************/
@@ -199,6 +203,7 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
     socketShifumi.on('game-spectate', (gameId, player, opponentName) => {
         const opponent = document.getElementById('opponent-name')
         const next = document.getElementById('change-player');
+        const forfeit = document.getElementById('forfeit-button');
 
         gameIdShifumi = gameId;
         spectate = {
@@ -211,8 +216,10 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
         if (opponent) {
             opponent.textContent = `${player.name} versus ${opponentName}`;
             if (next)
-                next.hidden = false;
+                next.style.display = 'block';
         }
+        if (forfeit)
+            forfeit.textContent = 'quit';
     });
 
     /******************************************************************************/
@@ -347,8 +354,8 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
         }
         if (spectate.spec)
         {
-            spectate.playerCard?.forEach((card, index) => {
-                if (card[0] == card[0] && card[1] == card[1]) {
+            spectate.playerCard?.forEach((cards, index) => {
+                if (cards[0] == card[0] && cards[1] == card[1]) {
                     const button = document.getElementById(`card${index + 1}-button`);
                     if (button)
                         button.textContent = '';
