@@ -80,6 +80,9 @@ export function getSockets(): [Socket, Socket, Socket] {
 		socketChat.on('friend-delete', () => {
 			notify('friend delete');
 			friend_reload();
+			const friends_chat = document.getElementById('lobby_chat');
+			if (friends_chat)
+				friends_chat.innerHTML = ``;
 		});
     }
 

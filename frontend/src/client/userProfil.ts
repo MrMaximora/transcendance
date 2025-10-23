@@ -26,7 +26,7 @@ export async function init() {
       			<img src="${data.user.profile_image_url || '/assets/default-avatar.png'}" class="profil-avatar" />
       			<div class="profil-info">
         			<h2 class="profil-username">${data.user.username}</h2>
-        			<p class="profil-email">${data.user.email}</p>
+        			<p class="profil-email">${data.user.email || ''}</p>
        				<p class="profil-bio">${data.user.bio || 'No bio yet.'}</p>
       			</div>
     		</div>`
@@ -124,7 +124,7 @@ export async function init() {
 					<img src="${data.user.profile_image_url || '/assets/default-avatar.png'}" class="profil-avatar" />
 					<div class="profil-info">
 					<h2 class="profil-username">${data.user.username}</h2>
-					<p class="profil-email">${data.user.email}</p>
+					<p class="profil-email">${data.user.email || ''}</p>
 					<p class="profil-bio">${data.user.bio || 'No bio yet.'}</p>
 					</div>
 				</div>`;

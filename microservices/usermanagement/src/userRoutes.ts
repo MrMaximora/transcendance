@@ -51,7 +51,7 @@ export async function friendAdd(app: FastifyInstance) {
                 return reply.code(403).send({ error: 'Unable to be friend with yourself' });
 			if (req_friend)
 				return reply.code(408).send({ error: 'request !' });
-			if (friend_user.friends.split(',').lastIndexOf(friend.id.toString()))
+			if (friend_user.friends.split(',').lastIndexOf(friend.id.toString()) != -1)
 				return reply.code (410).send({ error: 'you already have this friend!'});
             const newRequests: FriendRequests = {
                 id: 0,
@@ -174,7 +174,11 @@ export async function updateProfile(app: FastifyInstance) {
                     return reply.code(401).send({ error: 'New password && confirm new not match' });
                 newPassword = await bcrypt.hash(newPassword, 10);
             }
-            const bio = body.bio.value || '';
+			let bio: string;
+			if (body.bio.value != '')
+				bio = body.bio.value;
+			else
+				bio = currentUser.bio || '';
             if (body.profile_image_url) {
                 const file = body.profile_image_url;
                 const uploadDir = path.join('./', 'uploads');
