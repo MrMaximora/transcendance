@@ -220,9 +220,9 @@ export function createPongSocket(socketPong: Socket | null) {
         {
             if (data.score[0] < data.score[1]){
                 msg = `Player 2 won`;
-                endMsg = `${data.score[1]} - ${data.score[0]}`
+                endMsg = `${data.score[0]} - ${data.score[1]}`
             }
-            else{
+            else {
                 msg = `Player 1 won`;
                 endMsg = `${data.score[0]} - ${data.score[1]}`
             }
