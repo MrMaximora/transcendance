@@ -351,5 +351,6 @@ export class Tournament {
                 throw new Error(`Lobby ${name} doesn't exist`); // Shouldn't happen...
             throw new Error(`Lobby ${name} isn't full`);        // ...neither should this
         }
+        this.emit("game-start", {round, name, gameID});
     }
 }

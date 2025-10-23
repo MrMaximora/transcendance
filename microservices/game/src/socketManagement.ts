@@ -187,8 +187,9 @@ export function socketManagement(io: Server) {
                     throw new Error(`joinTournament(tournamentName, p): ${errno}`);
                 socket.data.lobbyName = lobbyName;
                 console.log(`${lobbyName} was joined`);
-                TmManager.getTournament(lobbyName)!.on("game-start", ({ round, name, game }) => {
+                TmManager.getTournament(lobbyName)!.on("game-start", ({ round, name, gameID}) => {
                     console.log(`${name}: ${round[0][0]} vs ${round[1][0]}`)
+                    db.prepare(`UPDATE games SET status = 'playing', start_time = ? WHERE id = ?`).run(Date.now(), gameID);
                 }).on("won", ({ t, result }) => { // We can chain event listener for better code
                     if(result[0][1] !== (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).id) return;
                     let Msg = "you won! Go in the winner bracket";
