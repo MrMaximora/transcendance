@@ -193,7 +193,7 @@ export async function msg_lobby(event: MouseEvent) {
 
 					friends_lobby.appendChild(nameFriend);
 					friends_lobby.appendChild(addFriend);
-
+					
 					const requestsContainer = document.createElement("div");
 					requestsContainer.id = "friend-requests";
 					friends_lobby.appendChild(requestsContainer);
@@ -220,6 +220,7 @@ export async function msg_lobby(event: MouseEvent) {
 						} catch (err) {
 							console.error('Error:', err);
 						}
+						nameFriend.value = '';
 						friend_reload();
 					});
 					loadFriendRequests(requestsContainer, token);

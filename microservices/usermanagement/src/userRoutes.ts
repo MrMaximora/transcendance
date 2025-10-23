@@ -40,18 +40,19 @@ export async function friendAdd(app: FastifyInstance) {
         try {
             const user = request.user as { userId: number, username: string };
             const { friendUsername } = request.body as { friendUsername: string };
+			const friend_user = db.prepare('SELECT id, friends FROM users WHERE username = ?').get(user.username) as {id: number, friends: string};
             const friend = db.prepare('SELECT id, socket FROM users WHERE username = ?').get(friendUsername) as { id: number, socket: string };
-			console.log("test");
             const req_friend = db
 								.prepare(`SELECT id, sender_id, receiver_id, status FROM friend_requests WHERE (((sender_id = ? AND receiver_id = ? ) OR (receiver_id = ? AND sender_id = ?)) AND status = 'pending')`)
 								.get(user.userId, friend.id, friend.id, user.userId) as { id: number };
-			console.log(req_friend);
 			if (!friend)
                 return reply.code(404).send({ error: 'Friend not found' });
             if (user.userId == friend.id)
                 return reply.code(403).send({ error: 'Unable to be friend with yourself' });
 			if (req_friend)
-				 return reply.code(408).send({ error: 'request !' });
+				return reply.code(408).send({ error: 'request !' });
+			if (friend_user.friends.split(',').lastIndexOf(friend.id.toString()))
+				return reply.code (410).send({ error: 'you already have this friend!'});
             const newRequests: FriendRequests = {
                 id: 0,
                 sender_id: user.userId,
@@ -249,7 +250,7 @@ export async function getHistoryGame(app: FastifyInstance) {
 					ORDER BY date DESC
 				`).all(user.userId, user.userId);
 			}
-            if (!games || games.length === 0)
+            if (!games)
                 return reply.code(404).send({ success: false, message: "No games found" });
             return reply.code(200).send({ success: true, games });
         } catch (err) {
