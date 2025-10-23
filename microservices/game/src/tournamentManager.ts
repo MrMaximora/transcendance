@@ -83,7 +83,7 @@ export class TournamentManager {
     // player is either playerID (number), socketID (string) or player_type ([playerID, socketID])
     isPlayerRegistered(player: number | string | player_type): Tournament | null {
         for (const [_, tournament] of this._tournaments) {
-            const result = tournament.players.find((p) => {
+            const result = tournament.remainingPlayers.find((p) => {
                 switch (typeof player) {
                     case "number":
                         return (p[0] === player); // compare only playerIDs

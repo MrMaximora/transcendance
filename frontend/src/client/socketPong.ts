@@ -201,6 +201,8 @@ export function createPongSocket(socketPong: Socket | null) {
         data.score[1] = Math.min(data.score[1], 5);
 		returnBtn.style.display = 'block';
 		msgGameEnd.style.display = "block";
+        msgGameEnd.style.color = "#24d0f2";
+        msgGameEnd.innerHTML = "";
         let msg = "You won"
         let endMsg = `${data.score[0]} - ${data.score[1]}`
         if (data.score[0] < data.score[1] && data.player1 == getUsernameFromToken())
@@ -229,11 +231,22 @@ export function createPongSocket(socketPong: Socket | null) {
         }
         if (isForfeit)
             msg += " by forfeit"
-        msgGameEnd.innerHTML = `
-            <p>${msg} with score of ${endMsg}</p>`
+        if (data.place) {
+            let suffix;
+            switch (data.place) {
+                case 1: { suffix = "st"; break; }
+                case 2: { suffix = "nd"; break; }
+                case 3: { suffix = "rd"; break; }
+                default: { suffix = "th"; break; }
+            }
+            msgGameEnd.innerHTML = `
+                <p>${msg} with score of ${endMsg}<br>You placed: ${data.place}${suffix}</p>`
+        }
+        else
+            msgGameEnd.innerHTML = `
+                <p>${msg} with score of ${endMsg}</p>`
         if (!canvas)
             return;
-        
         canvas.style.display = "none";
         ffBtn.style.display = "none";
         clearPong();

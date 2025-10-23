@@ -219,9 +219,9 @@ export class Tournament {
                     t._losingPlayers.push(result[0]);
                     t._numberOfGames--;
                     if (result[1][0] !== -1) {
-                        t._leaderboard.push(result[1]);
                         this.emit("won", { t: this, result });
                         this.emit("elimination", { t: this, result });
+                        t._leaderboard.push(result[1]);
                     } else {
                         this.emit("bye", { t: this, result });
                     }
@@ -336,8 +336,7 @@ export class Tournament {
         gameManager.findGame(name)!.on("game-end", ({game, _}) => {
                 (game.score[0] > game.score[1]) ?
                         onGameEnd(this, [round[0], round[1], game, [game.score[0], game.score[1]], false])
-                                : onGameEnd(this, [round[1], round[0], game, [game.score[1], game.score[0]], false]);
-
+                        : onGameEnd(this, [round[1], round[0], game, [game.score[1], game.score[0]], false]);
         }).on("game-state", (state) => {
                 this._associatedServer.to(`game-${gameID}`).emit("game-state", state);
         }).on("paddle-reflect", ({ballPos, ballDir}) => {

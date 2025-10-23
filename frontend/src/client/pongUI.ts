@@ -140,7 +140,6 @@ let pongInfo: PongInfo = new PongInfo();
 const MAX_PARTICLES = 600
 
 function drawAllParticles(ctx: CanvasRenderingContext2D) {
-    console.log(pongInfo.particles.length);
     if (pongInfo.particles.length > MAX_PARTICLES)
         pongInfo.particles.splice(0, pongInfo.particles.length - MAX_PARTICLES);
     pongInfo.particles.forEach((p: Particle) => {
