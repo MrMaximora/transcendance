@@ -9,6 +9,7 @@ export function init() {
         return;
     }
     const socket = getSocket(1);
+    const returnBtn = document.getElementById("return") as HTMLButtonElement;
     const createGameButton = document.getElementById('game-button') as HTMLButtonElement;
     const iaBtn = document.getElementById('game-vs-ia') as HTMLElement;
     const localGameBtn = document.getElementById('game-local') as HTMLElement;
@@ -154,6 +155,7 @@ export function init() {
                 socket!.emit("create-tournament", {
                     lobbyName: lobbyName.value
                 });
+                returnBtn.style.display = "none";
                 createGameButton.style.display = "none";
                 joinGameButton.style.display = "none";
                 tournamentBtn.style.display = "none";
@@ -163,6 +165,7 @@ export function init() {
                 startBtn.style.display = "none";
                 startTournament.style.display = "block";
                 quitBtn.style.display = 'block';
+
             }
             catch (err) {
                 console.error("Create tournament error", err);
@@ -173,8 +176,7 @@ export function init() {
         startTournament.addEventListener('click', async (e) => {
             e.preventDefault();
             socket!.emit('tournament-start')
-        }
-        );
+        });
     }
     if (joinGameButton) {
         joinGameButton.addEventListener("click", async (e) => {
@@ -228,6 +230,7 @@ export function init() {
     if (quitBtn) {
         quitBtn.addEventListener("click", () => {
             const lobbyElem = document.getElementById('lobbyname') as HTMLParagraphElement;
+            socket!.emit("left-game");
             if (!lobbyElem)
                 return;
             const lobbyText = lobbyElem.textContent || "";

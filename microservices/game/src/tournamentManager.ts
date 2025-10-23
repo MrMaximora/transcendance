@@ -46,9 +46,9 @@ export class TournamentManager {
     leaveTournament(name: string, player: player_type) {
         if (!this._tournaments.has(name))
             return 1; // tournament doesn't exist
-        if (!this.isPlayerRegistered(player))
-            return 2; // player is not in a tournament
         const t: Tournament = this._tournaments.get(name)!;
+        if (t.players.indexOf(player) == -1)
+            return 2; // player is not in this tournament
         if (t.state == "running")
             return 3; // player cannot leave a tournament if it started
         t.unregisterPlayer(player);

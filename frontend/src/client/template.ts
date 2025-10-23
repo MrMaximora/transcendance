@@ -31,7 +31,6 @@ const templates: Record<string, () => string> = {
 									<input type="checkbox" id="2fa" />
 									<p>2FA mail</p>
 								</label>
-								<a href="#">Forgot password?</a>
 							</div>
 							<button type="submit">Login</button>
 							<div class="register">

@@ -72,7 +72,6 @@ export class GameAI {
         if (this._moveCycle > 0) return;
         if (this._lastState!.ballSpd > this._speedThreat) {
             this._decision = "attack";
-            console.log("Im attacking now");
         }
         let impactPosY = 0;
         if (this._lastState!.ballDir.x > 0) {
@@ -91,9 +90,6 @@ export class GameAI {
         const paddleY = this._lastState!.rightPaddle!.y + padLen2;
         const dY = impactPosY - paddleY;
         this._moveCycle = Math.abs(Math.round(dY / Paddle.speed));
-        console.log(`impactPosY: ${impactPosY}`);
-        console.log(`paddleY: ${paddleY}`);
-        console.log(`dY: ${dY}`);
         if (dY > 0)
             GameManager.getInstance().findGame(this.lobby)!.getPaddle(-2)!.shouldMove = [false, true]; // Go up
         else if (dY < 0)
