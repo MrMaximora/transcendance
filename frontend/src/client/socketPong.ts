@@ -119,6 +119,31 @@ export function createPongSocket(socketPong: Socket | null) {
             navigateTo('/pong')
     });
 
+    socketPong.on('reload-pong', () => {
+        navigateTo('/pong');
+    });
+
+    socketPong.on('tournament-started', (tournamentName) => {
+        notify(`Tournament ${tournamentName} has started`);
+    });
+
+    socketPong.on('tournament-bye-round', (tournamentName) => {
+        const canvas = document.getElementById("pong-canvas") as HTMLCanvasElement;
+        const ffBtn = document.getElementById("pong-ff") as HTMLButtonElement;
+        const msgGameEnd = document.getElementById("msg-end") as HTMLElement;
+        const returnBtn = document.getElementById('return') as HTMLDivElement;
+        const pongWrapper = document.getElementById('pong-wrapper') as HTMLDivElement;
+
+        msgGameEnd.style.display = "block";
+        canvas.style.display = "none";
+        ffBtn.style.display = "none";
+        returnBtn.style.display = "none";
+        pongWrapper.style.display = "none";
+        msgGameEnd.style.color = "#e826f2";
+        msgGameEnd.innerHTML = "<p>You are in a bye-round<br>Waiting for other to finish</p>";
+        notify("Tournament is letting your rest this round!");
+    });
+
     socketPong.on('game-state', (state) => {
     	const ffBtn = document.getElementById("pong-ff") as HTMLButtonElement;
         const msgGameEnd = document.getElementById("msg-end") as HTMLElement;
@@ -196,10 +221,11 @@ export function createPongSocket(socketPong: Socket | null) {
         const ffBtn = document.getElementById("pong-ff") as HTMLButtonElement;
         const msgGameEnd = document.getElementById("msg-end") as HTMLElement;
 		const returnBtn = document.getElementById('return') as HTMLDivElement;
-        const isForfeit = data.score[0] + data.score[1] > 10;
+        const isForfeit = data.score[0] + data.score[1] > 10; // because 4 + 5 = 9 so > 10 is logic
         data.score[0] = Math.min(data.score[0], 5);
         data.score[1] = Math.min(data.score[1], 5);
-		returnBtn.style.display = 'block';
+        if (!data.isTournament)
+		    returnBtn.style.display = 'block';
 		msgGameEnd.style.display = "block";
         msgGameEnd.style.color = "#24d0f2";
         msgGameEnd.innerHTML = "";
@@ -259,6 +285,10 @@ export function createPongSocket(socketPong: Socket | null) {
 
     socketPong.on('connect_error', (err) => {
         console.error('Connection error:', err.message);
+    });
+
+    socketPong.on('notify', (msg) => {
+       notify(msg);
     });
 
     return socketPong;

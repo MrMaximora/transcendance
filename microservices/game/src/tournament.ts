@@ -192,8 +192,6 @@ export class Tournament {
                         t._losingPlayers.push(result[1]);
                         this.emit("won", { t: this, result });
                         this.emit("lose", { t: this, result });
-                    } else {
-                        this.emit("bye", { t: this, result });
                     }
                     t._numberOfGames--;
                     if (!t._numberOfGames) {
@@ -222,8 +220,6 @@ export class Tournament {
                         this.emit("won", { t: this, result });
                         this.emit("elimination", { t: this, result });
                         t._leaderboard.push(result[1]);
-                    } else {
-                        this.emit("bye", { t: this, result });
                     }
                     if (!t._numberOfGames) {
                         t._winnerBracket = t._initBrackets(t._winningPlayers);
@@ -299,6 +295,7 @@ export class Tournament {
     ) {
         if (round[1][0] === -1) {
             onGameEnd(this, [round[0], round[1], new Game(123456789), [0, 11], false]);
+            this.emit('tournament-bye-round', {t: this, playerSocket: round[0][1]});
             return;
         }
         // // Create the associated game

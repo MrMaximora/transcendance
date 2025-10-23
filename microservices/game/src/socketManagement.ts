@@ -187,16 +187,17 @@ export function socketManagement(io: Server) {
                     throw new Error(`joinTournament(tournamentName, p): ${errno}`);
                 socket.data.lobbyName = lobbyName;
                 console.log(`${lobbyName} was joined`);
-                TmManager.getTournament(lobbyName)!.on("game-start", ({ round, name, gameID}) => {
-                    console.log(`${name}: ${round[0][0]} vs ${round[1][0]}`)
-                    db.prepare(`UPDATE games SET status = 'playing', start_time = ? WHERE id = ?`).run(Date.now(), gameID);
+                TmManager.getTournament(lobbyName)!.on("game-start", ({ round, name, game }) => {
+                    db.prepare(`UPDATE games SET status = 'playing', start_time = ? WHERE lobby_name = ?`).run(Date.now(), name);
                 }).on("won", ({ t, result }) => { // We can chain event listener for better code
                     if(result[0][1] !== (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).id) return;
                     let Msg = "you won! Go in the winner bracket";
                     let place: number | null = null;
+                    let isTournament: boolean = true;
                     if(result[4]) {
                         Msg = "you won! You won the tournament";
                         place = 1;
+                        isTournament = false;
                     }
                     (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).emit("game-end", {
                         name: result[2].name,
@@ -204,7 +205,8 @@ export function socketManagement(io: Server) {
                         player2: manager.getUsernameFromSocket(result[1][1], io),
                         score: [result[3][0], result[3][1]],
                         tMsg: Msg,
-                        place
+                        place,
+                        isTournament
                     });
                 }).on("lose", ({ t, result }) => {
                     if(result[1][1] !== (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).id) return;
@@ -214,17 +216,21 @@ export function socketManagement(io: Server) {
                         player2: manager.getUsernameFromSocket(result[1][1], io),
                         score: [result[3][0], result[3][1]],
                         tMsg: "you lost! Go in the loser bracket",
+                        isTournament: true
                     });
                 }).on("elimination", ({ t, result }) => {
-                    if(result[1][1] !== (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).id) return;
+                    if (result[1][1] !== (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).id) return;
                     (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).emit("game-end", {
                         name: result[2].name,
                         player1: manager.getUsernameFromSocket(result[0][1], io),
                         player2: manager.getUsernameFromSocket(result[1][1], io),
                         score: [result[3][0], result[3][1]],
                         tMsg: `you lost! You have been eliminated by ${manager.getUsernameFromSocket(result[0][1], io)}.`,
-                        place: t.remainingPlayers.length
-                    });
+                        place: t.remainingPlayers.length,
+                    })
+                }).on("tournament-bye-round", ({ t, playerSocket }) => {
+                    if(playerSocket !== (io.sockets.sockets as any).get(t.players.find((p) => p[0] == socket.data.userId)[1]).id) return;
+                    (io.sockets.sockets as any).get(t._players.find((p) => p[0] == socket.data.userId)[1]).emit("tournament-bye-round", t.name);
                 });
             } catch (e) {
                 console.error(e);
@@ -297,6 +303,9 @@ export function socketManagement(io: Server) {
                     const errno = TmManager.deleteTournament(lobbyName);
                     console.log("errno: ", errno);
                 }, socket.handshake.auth.token);
+                for (const player of TmManager.getTournament(lobbyName)!.players) {
+                    io.to(player[1]).emit('tournament-started', lobbyName);
+                }
                 if (errno)
                     throw new Error(`Failed to start tournament ${errno}`);
             }
@@ -336,7 +345,13 @@ export function socketManagement(io: Server) {
             socket.data.lobbyName = lobbyname;
         });
 
-        socket.on('left-game', ({ lobbyname }) => {
+        socket.on('left-game', (lobbyname) => {
+            const t = TmManager.isPlayerRegistered(socket.data.userId);
+            if (t) {
+                TmManager.leaveTournament(lobbyname, [socket.data.userId, socket.id])
+                io.to(socket.id).emit('reload-pong');
+                return;
+            }
             const game = manager.findGame(lobbyname);
             if (!game)
                 return;
