@@ -97,6 +97,21 @@ function hiddenButtonCard(hidden: boolean) {
     }
 }
 
+export function enableCard(isEnable: boolean) {
+    const butts = document.querySelectorAll<HTMLButtonElement>(".card");
+
+    butts.forEach((btn) => {
+        if (isEnable) {
+            btn.classList.add('wait');
+            btn.classList.remove('play');
+        }
+        else {
+            btn.classList.add('play');
+            btn.classList.remove('wait');
+        }
+    })
+}
+
 export function init() {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -113,6 +128,18 @@ export function init() {
     const card3 = document.getElementById('card3-button');
     const coin = document.getElementById('coin-button');
     const info = document.getElementById('info-coin');
+    const played = document.getElementById('card-played');
+    const opponent = document.getElementById('opponent-card-played');
+
+    enableCard(true);
+
+    if (played) {
+        played.style.display = 'none';
+    }
+
+    if (opponent) {
+        opponent.style.display = 'none';
+    }
 
     if (forfeit) {
         forfeit.style.display = 'none';
@@ -220,7 +247,8 @@ export function init() {
                     cardId : myCard[0][0],
                     cardNumber : myCard[0][1]
                 });
-            card1.textContent = '[][]';
+            card1.textContent = '';
+            enableCard(false);
         });
     }
     if (card2)
@@ -237,7 +265,8 @@ export function init() {
                     cardId : myCard[1][0],
                     cardNumber : myCard[1][1]
                 });
-            card2.textContent = '[][]';
+            card2.textContent = '';
+            enableCard(false);
         });
     }
     if (card3)
@@ -254,7 +283,8 @@ export function init() {
                     cardId : myCard[2][0],
                     cardNumber : myCard[2][1]
                 });
-            card3.textContent = '[][]';
+            card3.textContent = '';
+            enableCard(false);
         });
     }
     
@@ -265,8 +295,10 @@ export function init() {
     if (coin)
     {
         coin.hidden = true;
+
         coin.addEventListener('click', async (e) => {
             e.preventDefault();
+            enableCard(false);
             if (spectate.spec || usedCoin)
                 return ;
             choseCard = -1;

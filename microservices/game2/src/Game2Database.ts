@@ -206,7 +206,7 @@ export async function saveStats(gameId: number, token: string, mmrPlayerOne, mmr
             player_two_id : game.player_two_id!,
             final_score : game.game_score!,
             round_number : game.round_nmb,
-            game_time : game.game_time! / 4, // temps en s
+            game_time : game.game_time!, // temps en s
             mmr_gain_player_one : ((mmrPlayerOne == -2000 ? 'private' : mmrPlayerOne.toString())),
             mmr_gain_player_two : ((mmrPlayerTwo == -2000 ? 'private' : mmrPlayerTwo.toString())),
             date : game.date!
@@ -236,11 +236,10 @@ export async function saveStats(gameId: number, token: string, mmrPlayerOne, mmr
 
 export function gameIsPrivate(gameId: number): number
 {
-    const { is_private } = db.prepare(`
+    const is_private = db.prepare(`
         SELECT is_private FROM games2 WHERE id = ? 
     `).get(gameId) as {is_private: number};
-
-    return is_private;
+    return is_private.is_private;
 }
 
 export function getAllGame() {

@@ -39,8 +39,7 @@ export class GameBoard {
     }
 
     public drawCard(player :number) {
-        if (this.drawPile.length <= 0)
-        {
+        if (this.drawPile.length <= 0) {
             return ;
         }
         if (player == 1) {

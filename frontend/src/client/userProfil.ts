@@ -52,8 +52,8 @@ export async function init() {
 						const isWin = (isPlayerOne && score1 > score2) || (!isPlayerOne && score2 > score1);
 						const mmrGain = isPlayerOne ? game.mmr_gain_player_one : game.mmr_gain_player_two;
 						const otherId = isPlayerOne ? game.player_two_id : game.player_one_id;
-						let otherName = otherId === -1 ? 'invited' : otherId === -2 ? 'AI' : null;
-						if(!otherName) {
+						let otherName = otherId === -1 ? 'invited' : otherId <= -2 ? 'AI' : null;
+						if(!otherName && otherId > 0) {
 							const resName = await fetch(`/api/user/data?id=${otherId}`, {
 								method: 'GET',
 								headers: {

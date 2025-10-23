@@ -28,6 +28,7 @@ export async function clearRoom(room: string)
 export class game
 {
     private gameId: number;
+    private status: number;
     private playerOne : Player;
     private playerTwo : Player;
 
@@ -50,6 +51,7 @@ export class game
         this.playerOne = playerOneInfo;
         this.playerTwo = playerTwoInfo;
         this.gameId = gameId;
+        this.status = 1;
     }
 
     public async spectate(player: number, socket)
@@ -141,6 +143,8 @@ export class game
                 return ;
             }
 
+            if (!this.status)
+                return;
             this.playTime++;
             this.gameTime++;
             setTimeout(loop, this.delay / 4);
@@ -364,6 +368,7 @@ export class game
             deleteGameFromDB(this.gameId);
             IaManager.getInstance().deleteIaByGameId(this.gameId);
         }
+        this.status = 0
     }
 
     private sleep(ms: number): Promise<void>

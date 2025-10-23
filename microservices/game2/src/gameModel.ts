@@ -33,7 +33,7 @@ export function createGameLobby(game: GameData) {
     game.start_time ?? null,
     game.game_time ?? null,
     game.round_nmb,
-    game.is_private,
+    game.is_private ?? "1",
     game.is_spectable,
     game.date ?? new Date().toISOString().split('T')[0],
   );

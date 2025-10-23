@@ -3,6 +3,7 @@ import { handleRoute } from "./navClient.js";
 import { getUserIdFromToken } from './socketClient.js';
 import { notify } from './notify.js'
 import {getUsernameFromToken} from "./loginClient.js";
+import {enableCard} from "./shifumiStart.js";
 
 export let gameIdShifumi: number = -1;
 export let myCard: [number, number][] = [];
@@ -144,9 +145,8 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
     /******************************************************************************/
 
     socketShifumi.on('started-game', (gameId: number) => {
-        gameIdShifumi = gameId; // a mettre aussi dans la fonction pour rerejoindre un partie
+        gameIdShifumi = gameId;
 
-        // a passer dans un fonction a appeler pour rendre le code plus propre 
         const forfeit = document.getElementById('forfeit-button');
         const start = document.getElementById('start-button');
         const quit = document.getElementById('quit-button');
@@ -229,9 +229,9 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
         if (pointsText)
             pointsText.textContent = `${myPoints} - ${opponentPoints}`;
         if (playedCard)
-            playedCard.textContent = '';
+            playedCard.style.display = 'none';
         if (opponentPlayedCard)
-            opponentPlayedCard.textContent = '';
+            opponentPlayedCard.style.display = 'none';
     });
 
     socketShifumi.on('loseRound', (myPoints: number, opponentPoints: number) => {
@@ -242,9 +242,9 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
         if (pointsText)
             pointsText.textContent = `${myPoints} - ${opponentPoints}`;
         if (playedCard)
-            playedCard.textContent = '';
+            playedCard.style.display = 'none';
         if (opponentPlayedCard)
-            opponentPlayedCard.textContent = '';
+            opponentPlayedCard.style.display = 'none';
     });
 
     socketShifumi.on('drawRound', () => {
@@ -252,10 +252,10 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
         const playedCard = document.getElementById('card-played') as HTMLElement;
 
         if (playedCard)
-            playedCard.textContent = '';
+            playedCard.style.display = 'none';
         if (opponentPlayedCard)
-            opponentPlayedCard.textContent = '';
-    }) // a ajouter dans le manager game
+            opponentPlayedCard.style.display = 'none';
+    })
 
     socketShifumi.on('equal', () => {
         const opponentPlayedCard = document.getElementById('opponent-card-played') as HTMLElement;
@@ -263,9 +263,9 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
 
         notify('no one win this round');
         if (playedCard)
-            playedCard.textContent = '';
+            playedCard.style.display = 'none';
         if (opponentPlayedCard)
-            opponentPlayedCard.textContent = '';
+            opponentPlayedCard.style.display = 'none';
     }); // nom a changer ?
 
     socketShifumi.on('forfeit', (player : string) => {
@@ -308,11 +308,12 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
             const button = document.getElementById(`card${i + 1}-button`)
             if (button) {
                 if (i < len)
-                    button.hidden = false;
+                    button.style.display = 'block';
                 else
-                    button.hidden = true;
+                    button.style.display = 'none';
             }
         }
+        enableCard(true);
     });
 
     socketShifumi.on('end-time', () => {
@@ -325,29 +326,32 @@ export function createShifumiSocket(socketShifumi: Socket | null) {
         cardNumber : myCard[random][1]
       });
       if (card)
-        card.textContent = '[][]'; // a changer par l'affichage basique 
+        card.textContent = '';
     });
 
     socketShifumi.on('opponent-played-card', (card: [number, number]) => {
         const playedCard = document.getElementById('opponent-card-played') as HTMLElement;
 
-        if (playedCard)
+        if (playedCard) {
+            playedCard.style.display = 'block';
             playedCard.textContent = `${cardTypes[card[0]]}`;
+        }
     });
 
     socketShifumi.on('played-card', ( card: [ number, number ] ) => {
         const playedCard = document.getElementById('card-played') as HTMLElement;
 
-        if (playedCard)
+        if (playedCard) {
+            playedCard.style.display = 'block';
             playedCard.textContent = `${cardTypes[card[0]]}`;
-
+        }
         if (spectate.spec)
         {
             spectate.playerCard?.forEach((card, index) => {
                 if (card[0] == card[0] && card[1] == card[1]) {
                     const button = document.getElementById(`card${index + 1}-button`);
                     if (button)
-                        button.textContent = '[][]';
+                        button.textContent = '';
                 }
             })
         }
